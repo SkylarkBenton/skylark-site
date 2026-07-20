@@ -81,7 +81,7 @@
       <div class="detail-row"><span>Guest</span><span id="d_name"></span></div>
       <div class="detail-row"><span>Date</span><span id="d_date"></span></div>
       <div class="detail-row"><span>Rental Rate</span><span id="d_rate"></span></div>
-      <div class="detail-row"><span>Deposit (50% — counts toward your total, not a separate hold)</span><span id="d_deposit"></span></div>
+      <div class="detail-row"><span>Deposit (50% — charged today)</span><span id="d_deposit"></span></div>
     </div>
 
     <div class="card">
@@ -96,28 +96,31 @@
         <h3>3. Guest Capacity</h3>
         <p>Maximum occupancy is 50 guests.</p>
 
-        <h3>4. Rental Fee &amp; Deposit</h3>
-        <p>Your deposit is 50% of the rental rate — it's the first half of your total rental payment, not a separate security or damage charge. It's authorized as a hold on your card about 3-5 days before the event, then captured as your payment shortly after. The remaining balance will be invoiced through our payment processor and is due before the event date.</p>
+        <h3>4. Rental Fee, Deposit &amp; Balance</h3>
+        <p>Your deposit — 50% of the rental rate — is charged to your card today, as the first half of your total rental payment. The remaining 50% balance is automatically charged to the same card approximately 3-5 days before your event.</p>
 
-        <h3>5. Damage &amp; Additional Charges</h3>
-        <p>If damage, excessive mess, or a violation of this Agreement is identified, we will contact you with the estimated cost. You will have three (3) business days to respond. If we don't hear from you, or the issue isn't resolved in good faith, the card on file may be charged for the documented cost, including amounts beyond the deposit if necessary.</p>
+        <h3>5. Damage Hold</h3>
+        <p>At the same time your balance is charged, a separate refundable hold of $250 is placed on your card to cover any damage or excessive mess. This is not an additional charge — it's released automatically within a few days after your event if there's nothing to report. If damage exceeds $250, we'll contact you before charging anything beyond the hold.</p>
 
-        <h3>6. Cancellation &amp; Rescheduling</h3>
+        <h3>6. Damage &amp; Additional Charges</h3>
+        <p>If damage, excessive mess, or a violation of this Agreement is identified, we will contact you with the estimated cost. You will have three (3) business days to respond. If we don't hear from you, or the issue isn't resolved in good faith, the $250 hold may be captured toward that cost, and the card on file may be charged for any amount beyond it.</p>
+
+        <h3>7. Cancellation &amp; Rescheduling</h3>
         <p>All fees and deposits are non-refundable once booked. Rescheduling is available at no charge with at least 7 days' notice, with no limit on the number of times.</p>
 
-        <h3>7. Rules of Use</h3>
+        <h3>8. Rules of Use</h3>
         <p>No pets. Smoking permitted only in the designated outdoor area. This is a BYOB venue — you are responsible for lawful and responsible alcohol use by your guests, including compliance with minimum age laws. No illegal drugs or controlled substances. Be considerate of neighboring properties. You are responsible for your guests' conduct.</p>
 
-        <h3>8. Assumption of Risk &amp; Release of Liability</h3>
+        <h3>9. Assumption of Risk &amp; Release of Liability</h3>
         <p>You assume all risks of using the Venue and release The Skylark, its owners, and agents from claims arising from your event, except for the Venue's gross negligence or willful misconduct, and agree to indemnify the Venue against claims arising from your or your guests' use of the space.</p>
 
-        <h3>9. Photo &amp; Video Release</h3>
+        <h3>10. Photo &amp; Video Release</h3>
         <p>You grant The Skylark permission to photograph or record the event for marketing purposes.</p>
 
-        <h3>10. Governing Law</h3>
+        <h3>11. Governing Law</h3>
         <p>This Agreement is governed by the laws of the State of Louisiana.</p>
 
-        <h3>11. Electronic Acknowledgment</h3>
+        <h3>12. Electronic Acknowledgment</h3>
         <p>Checking the box below and entering your full legal name, together with the date, time, and IP address recorded at that moment, constitutes your valid electronic signature under the Louisiana Uniform Electronic Transactions Act and the federal ESIGN Act.</p>
       </div>
     </div>
@@ -132,7 +135,7 @@
 
       <div class="check-row">
         <input type="checkbox" id="agreeCheck">
-        <label for="agreeCheck">I have read and agree to the Rental Agreement above, and I authorize The Skylark to hold and charge the card below as described.</label>
+        <label for="agreeCheck">I have read and agree to the Rental Agreement above, and I authorize The Skylark to charge the card below immediately for my deposit, and to charge the balance and place a damage hold as described.</label>
       </div>
 
       <div class="field">
@@ -140,7 +143,7 @@
         <div id="card-element"></div>
       </div>
 
-      <button class="btn" id="submitBtn" onclick="submitAgreement()">Sign &amp; Save Card</button>
+      <button class="btn" id="submitBtn" onclick="submitAgreement()">Sign &amp; Pay Deposit</button>
       <div class="msg" id="formMsg"></div>
     </div>
   </div>
@@ -197,6 +200,20 @@
     document.getElementById('errorText').textContent = msg;
   }
 
+  // supabase-js's error.message is just a generic "non-2xx" string —
+  // the real error text we send back lives in the response body, which
+  // we have to read separately.
+  async function extractErrorMessage(error, data, fallback){
+    if(data?.error) return data.error;
+    if(error?.context){
+      try {
+        const body = await error.context.json();
+        if(body?.error) return body.error;
+      } catch(e){}
+    }
+    return fallback;
+  }
+
   async function submitAgreement(){
     const signedName = document.getElementById('signedName').value.trim();
     const agreed = document.getElementById('agreeCheck').checked;
@@ -213,7 +230,7 @@
     try {
       const { data: setupData, error: setupErr } = await sb.functions.invoke('create-setup-intent', { body: { token } });
       if(setupErr || !setupData || setupData.error){
-        throw new Error(setupData?.error || 'Could not start card setup.');
+        throw new Error(await extractErrorMessage(setupErr, setupData, 'Could not start card setup.'));
       }
 
       const result = await stripe.confirmCardSetup(setupData.client_secret, {
@@ -230,7 +247,7 @@
         body: { token, signedName, paymentMethodId }
       });
       if(saveErr || !saveData || saveData.error){
-        throw new Error(saveData?.error || 'Could not save your signature.');
+        throw new Error(await extractErrorMessage(saveErr, saveData, 'Could not save your signature.'));
       }
 
       document.getElementById('mainContent').innerHTML = '<div class="card"><h2>All Set!</h2><p style="color:var(--muted);">Your agreement is signed and your card is on file. Check your email — your door code is on its way now.</p></div>';
@@ -239,7 +256,7 @@
       msgEl.className = 'msg error';
       msgEl.textContent = err.message || 'Something went wrong. Please try again or contact us directly.';
       btn.disabled = false;
-      btn.textContent = 'Sign & Save Card';
+      btn.textContent = 'Sign & Pay Deposit';
     }
   }
 
