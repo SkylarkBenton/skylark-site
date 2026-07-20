@@ -109,6 +109,7 @@
       <div class="amenity"><div class="num">Bar</div><div class="label">Setup, BYOB</div></div>
       <div class="amenity"><div class="num">Games</div><div class="label">On Site</div></div>
       <div class="amenity"><div class="num">Noon–12am</div><div class="label">Rental Window</div></div>
+      <div class="amenity"><div class="num">$350 / $500</div><div class="label">Weekday / Weekend</div></div>
     </div>
   </section>
 
@@ -154,7 +155,11 @@
       <div class="field"><label>Event Type</label><input type="text" id="i_event" placeholder="Birthday, Shower, etc."></div>
       <div class="field"><label>Guest Count</label><input type="number" id="i_guests" min="1"></div>
     </div>
-    <div class="field"><label>Requested Date</label><input type="date" id="i_date"></div>
+    <div class="field">
+      <label>Requested Date</label>
+      <input type="date" id="i_date" onchange="checkDateAvailability()">
+      <div id="dateCheckMsg" style="font-size:12px;margin-top:6px;"></div>
+    </div>
     <div class="field"><label>Message</label><textarea id="i_message" placeholder="Anything else we should know?"></textarea></div>
 
     <div class="submit-row">
@@ -178,6 +183,12 @@
   let currentYear = new Date().getFullYear();
   const DOWS = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
   const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  // Weekday (Mon-Thu) = $350, Weekend (Fri-Sun) = $500
+  function priceForDate(dateStr){
+    const day = new Date(dateStr + 'T00:00:00').getDay(); // 0=Sun...6=Sat
+    return (day === 0 || day === 5 || day === 6) ? 500 : 350;
+  }
 
   function changeMonth(delta){
     currentMonth += delta;
@@ -212,9 +223,37 @@
         const end = b.end_date || b.event_date;
         return dateStr >= b.event_date && dateStr <= end;
       });
-      html += '<div class="cal-day ' + (isTaken ? 'taken' : 'open') + '">' + day + '</div>';
+      html += '<div class="cal-day ' + (isTaken ? 'taken' : 'open') + '">' + day + (isTaken ? '' : '<div style="font-size:10px;color:var(--muted);margin-top:2px;">$' + priceForDate(dateStr) + '</div>') + '</div>';
     }
     grid.innerHTML = html;
+  }
+
+  let selectedDateIsTaken = false;
+
+  async function checkDateAvailability(){
+    const dateStr = document.getElementById('i_date').value;
+    const msgEl = document.getElementById('dateCheckMsg');
+    selectedDateIsTaken = false;
+    if(!dateStr){ msgEl.textContent = ''; return; }
+
+    const { data } = await sb.from('public_availability')
+      .select('event_date, end_date')
+      .lte('event_date', dateStr)
+      .or('end_date.gte.' + dateStr + ',end_date.is.null');
+
+    const taken = (data || []).some(b => {
+      const end = b.end_date || b.event_date;
+      return dateStr >= b.event_date && dateStr <= end;
+    });
+
+    if(taken){
+      selectedDateIsTaken = true;
+      msgEl.style.color = '#f0938f';
+      msgEl.textContent = 'That date is already booked — pick another date, or submit anyway if you\u2019d like to be notified of cancellations.';
+    } else {
+      msgEl.style.color = '#8fd6cf';
+      msgEl.textContent = 'That date is open. Estimated price: $' + priceForDate(dateStr) + '.';
+    }
   }
 
   async function submitInquiry(){
