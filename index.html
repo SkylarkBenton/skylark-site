@@ -148,19 +148,19 @@
 
     <div class="field"><label>Name</label><input type="text" id="i_name" required></div>
     <div class="row2">
-      <div class="field"><label>Email</label><input type="email" id="i_email"></div>
-      <div class="field"><label>Phone</label><input type="tel" id="i_phone"></div>
+      <div class="field"><label>Email</label><input type="email" id="i_email" required></div>
+      <div class="field"><label>Phone</label><input type="tel" id="i_phone" required></div>
     </div>
     <div class="row2">
-      <div class="field"><label>Event Type</label><input type="text" id="i_event" placeholder="Birthday, Shower, etc."></div>
-      <div class="field"><label>Guest Count</label><input type="number" id="i_guests" min="1"></div>
+      <div class="field"><label>Event Type</label><input type="text" id="i_event" placeholder="Birthday, Shower, etc." required></div>
+      <div class="field"><label>Guest Count</label><input type="number" id="i_guests" min="1" required></div>
     </div>
     <div class="field">
       <label>Requested Date</label>
-      <input type="date" id="i_date" onchange="checkDateAvailability()">
+      <input type="date" id="i_date" onchange="checkDateAvailability()" required>
       <div id="dateCheckMsg" style="font-size:12px;margin-top:6px;"></div>
     </div>
-    <div class="field"><label>Message</label><textarea id="i_message" placeholder="Anything else we should know?"></textarea></div>
+    <div class="field"><label>Message</label><textarea id="i_message" placeholder="Anything else we should know?" required></textarea></div>
 
     <div class="submit-row">
       <button class="btn primary" style="border:none;cursor:pointer;" onclick="submitInquiry()" id="submitBtn">Submit Request</button>
@@ -258,10 +258,17 @@
 
   async function submitInquiry(){
     const name = document.getElementById('i_name').value.trim();
+    const email = document.getElementById('i_email').value.trim();
+    const phone = document.getElementById('i_phone').value.trim();
+    const eventType = document.getElementById('i_event').value.trim();
+    const guestCount = document.getElementById('i_guests').value;
+    const requestedDate = document.getElementById('i_date').value;
+    const message = document.getElementById('i_message').value.trim();
     const msgEl = document.getElementById('formMsg');
-    if(!name){
+
+    if(!name || !email || !phone || !eventType || !guestCount || !requestedDate || !message){
       msgEl.className = 'msg error';
-      msgEl.textContent = 'Please enter your name.';
+      msgEl.textContent = 'Please fill in every field so we have what we need to review your request.';
       return;
     }
 
@@ -271,12 +278,12 @@
 
     const payload = {
       name: name,
-      email: document.getElementById('i_email').value || null,
-      phone: document.getElementById('i_phone').value || null,
-      event_type: document.getElementById('i_event').value || null,
-      guest_count: document.getElementById('i_guests').value ? parseInt(document.getElementById('i_guests').value) : null,
-      requested_date: document.getElementById('i_date').value || null,
-      message: document.getElementById('i_message').value || null,
+      email: email,
+      phone: phone,
+      event_type: eventType,
+      guest_count: parseInt(guestCount),
+      requested_date: requestedDate,
+      message: message,
     };
 
     const { error } = await sb.from('inquiries').insert(payload);
