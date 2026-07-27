@@ -294,6 +294,18 @@
       <input type="date" id="i_date" onchange="checkDateAvailability()" required>
       <div id="dateCheckMsg" style="font-size:12px;margin-top:6px;"></div>
     </div>
+    <div class="field"><label>How Did You Hear About Us?</label>
+      <select id="i_heard_about">
+        <option value="">Select one (optional)</option>
+        <option value="Facebook">Facebook</option>
+        <option value="Instagram">Instagram</option>
+        <option value="Google Search">Google Search</option>
+        <option value="Airbnb">Airbnb</option>
+        <option value="Word of Mouth / Friend">Word of Mouth / Friend</option>
+        <option value="Drove By / Saw the Building">Drove By / Saw the Building</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
     <div class="field"><label>Message</label><textarea id="i_message" placeholder="Anything else we should know?" required></textarea></div>
 
     <div class="submit-row">
@@ -417,6 +429,7 @@
       event_type: eventType,
       guest_count: parseInt(guestCount),
       requested_date: requestedDate,
+      heard_about: document.getElementById('i_heard_about').value || null,
       message: message,
     };
 
@@ -432,7 +445,7 @@
 
     msgEl.className = 'msg success';
     msgEl.textContent = "Thanks! We'll follow up shortly to confirm your date.";
-    ['i_name','i_email','i_phone','i_event','i_guests','i_date','i_message'].forEach(id => {
+    ['i_name','i_email','i_phone','i_event','i_guests','i_date','i_heard_about','i_message'].forEach(id => {
       document.getElementById(id).value = '';
     });
   }
