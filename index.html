@@ -64,6 +64,15 @@
   .testimonial p{ font-size:14px; color:#c9c9cc; line-height:1.6; margin:0 0 12px; font-style:italic; }
   .testimonial .reviewer{ font-size:12px; color:var(--muted); letter-spacing:0.5px; }
 
+  .faq-list{ display:flex; flex-direction:column; gap:10px; }
+  .faq-item{ background:var(--ink-2); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .faq-q{ width:100%; text-align:left; background:none; border:none; color:var(--cream); font-family:inherit; font-size:15px; font-weight:500; padding:16px 18px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
+  .faq-icon{ color:var(--red-lt); font-size:18px; }
+  .faq-a{ max-height:0; overflow:hidden; transition:max-height 0.25s ease; }
+  .faq-a p{ margin:0; padding:0 18px 16px; font-size:14px; color:#c9c9cc; line-height:1.6; }
+  .faq-item.open .faq-a{ max-height:200px; }
+  .faq-item.open .faq-icon{ transform:rotate(45deg); }
+
   /* Calendar */
   .month-nav{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
   .month-nav h3{ font-size:18px; margin:0; }
@@ -97,6 +106,24 @@
   footer{ padding:40px 0; text-align:center; color:var(--muted); font-size:13px; }
   footer a{ color:var(--muted); }
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "What's included in the rental?", "acceptedAnswer": {"@type": "Answer", "text": "The space itself, the bar setup, seating for your group, and games, all for your noon-to-midnight rental window. You bring the food, drinks, and decorations."}},
+    {"@type": "Question", "name": "Do you provide alcohol?", "acceptedAnswer": {"@type": "Answer", "text": "No, The Skylark is BYOB. We provide the bar space and setup; you bring whatever you'd like to drink."}},
+    {"@type": "Question", "name": "What's the maximum capacity?", "acceptedAnswer": {"@type": "Answer", "text": "50 guests."}},
+    {"@type": "Question", "name": "What are the rental hours?", "acceptedAnswer": {"@type": "Answer", "text": "Every rental runs noon to midnight on your chosen date."}},
+    {"@type": "Question", "name": "How does payment work?", "acceptedAnswer": {"@type": "Answer", "text": "A 50% deposit is charged when you sign your rental agreement, counting toward your total. The remaining balance, plus a refundable $250 damage hold, is charged a few days before your event."}},
+    {"@type": "Question", "name": "What's your cancellation policy?", "acceptedAnswer": {"@type": "Answer", "text": "Bookings are non-refundable once confirmed, but you can reschedule at no charge with at least 7 days notice, as many times as needed."}},
+    {"@type": "Question", "name": "Can we bring our own decorations or catering?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, bring your own decor, food, and catering. Everything should be cleaned up and trash taken out by the end of your rental."}},
+    {"@type": "Question", "name": "Is smoking or vaping allowed?", "acceptedAnswer": {"@type": "Answer", "text": "Smoking is permitted only in the designated outdoor area, not inside the venue."}},
+    {"@type": "Question", "name": "Are pets allowed?", "acceptedAnswer": {"@type": "Answer", "text": "No pets are permitted on the premises."}},
+    {"@type": "Question", "name": "How do I book a date?", "acceptedAnswer": {"@type": "Answer", "text": "Check the availability calendar, then submit a request with your date and details. The Skylark team follows up to confirm."}}
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -110,6 +137,7 @@
       <a href="#gallery">Gallery</a>
       <a href="#availability">Availability</a>
       <a href="#inquire">Inquire</a>
+      <a href="#faq">FAQ</a>
       <a href="terms.html">Terms</a>
     </nav>
   </header>
@@ -188,6 +216,52 @@
     <div class="legend">
       <span><i class="dot" style="background:var(--ink-2);border:1px solid var(--line)"></i> Open</span>
       <span><i class="dot" style="background:var(--red)"></i> Booked</span>
+    </div>
+  </section>
+
+  <section id="faq">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What's included in the rental? <span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>The space itself, the bar setup, seating for your group, and games — all for your noon-to-midnight rental window. You bring the food, drinks, and decorations.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Do you provide alcohol? <span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>No — The Skylark is BYOB. We provide the bar space and setup; you bring whatever you'd like to drink.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What's the maximum capacity? <span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>50 guests.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What are the rental hours? <span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Every rental runs noon to midnight on your chosen date.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">How does payment work? <span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>A 50% deposit is charged when you sign your rental agreement — this counts toward your total, not a separate fee. The remaining balance, plus a refundable $250 damage hold, is charged a few days before your event.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What's your cancellation policy? <span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Bookings are non-refundable once confirmed, but you can reschedule at no charge with at least 7 days' notice — as many times as you need.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Can we bring our own decorations or catering? <span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Absolutely — bring your own decor, food, and catering. Just make sure everything's cleaned up and trash is taken out by the end of your rental.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Is smoking or vaping allowed? <span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Smoking is permitted only in the designated outdoor area — not inside the venue.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Are pets allowed? <span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>No pets are permitted on the premises.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">How do I book a date? <span class="faq-icon">+</span></button>
+        <div class="faq-a"><p>Check the availability calendar above, then submit a request below with your date and details. We'll follow up to confirm — most requests get approved quickly.</p></div>
+      </div>
     </div>
   </section>
 
@@ -405,6 +479,11 @@
     if(newIndex < 0) newIndex = carouselCount - 1;
     if(newIndex >= carouselCount) newIndex = 0;
     carouselGoTo(newIndex);
+  }
+
+  function toggleFaq(btn){
+    const item = btn.closest('.faq-item');
+    item.classList.toggle('open');
   }
 
   initCarousel();
