@@ -45,8 +45,24 @@
   .amenity .num{ font-family:'Oswald',sans-serif; font-size:24px; color:var(--red-lt); }
   .amenity .label{ font-size:12px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-top:4px; }
 
-  .gallery{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
-  .gallery img{ width:100%; height:200px; object-fit:cover; border-radius:10px; border:1px solid var(--line); display:block; background:var(--ink-2); }
+  .carousel{ position:relative; border-radius:14px; overflow:hidden; border:1px solid var(--line); background:var(--ink-2); }
+  .carousel-track{ display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; }
+  .carousel-track::-webkit-scrollbar{ display:none; }
+  .carousel-track img{ flex:0 0 100%; scroll-snap-align:start; width:100%; height:420px; object-fit:cover; display:block; }
+  @media(max-width:600px){ .carousel-track img{ height:260px; } }
+  .carousel-btn{ position:absolute; top:50%; transform:translateY(-50%); background:rgba(11,11,12,0.6); color:var(--chrome-lt); border:1px solid var(--line); width:40px; height:40px; border-radius:50%; font-size:20px; cursor:pointer; }
+  .carousel-btn.prev{ left:12px; }
+  .carousel-btn.next{ right:12px; }
+  .carousel-dots{ position:absolute; bottom:14px; left:0; right:0; display:flex; justify-content:center; gap:8px; }
+  .carousel-dots .dot{ width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.35); cursor:pointer; }
+  .carousel-dots .dot.active{ background:var(--red-lt); }
+
+  .review-badge{ text-align:center; color:var(--muted); font-size:14px; margin-bottom:24px; }
+  .review-badge .stars{ color:var(--red-lt); letter-spacing:2px; margin-right:6px; }
+  .testimonials{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+  .testimonial{ background:var(--ink-2); border:1px solid var(--line); border-radius:12px; padding:20px; }
+  .testimonial p{ font-size:14px; color:#c9c9cc; line-height:1.6; margin:0 0 12px; font-style:italic; }
+  .testimonial .reviewer{ font-size:12px; color:var(--muted); letter-spacing:0.5px; }
 
   /* Calendar */
   .month-nav{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
@@ -117,13 +133,44 @@
 
   <section id="gallery">
     <h2>The Space</h2>
-    <div class="gallery">
-      <img src="photos/1.jpg" alt="The Skylark interior" onerror="this.style.display='none'">
-      <img src="photos/2.jpg" alt="The Skylark bar" onerror="this.style.display='none'">
-      <img src="photos/3.jpg" alt="The Skylark seating" onerror="this.style.display='none'">
-      <img src="photos/4.jpg" alt="The Skylark games area" onerror="this.style.display='none'">
-      <img src="photos/5.jpg" alt="The Skylark exterior" onerror="this.style.display='none'">
-      <img src="photos/6.jpg" alt="The Skylark event setup" onerror="this.style.display='none'">
+    <div class="carousel">
+      <div class="carousel-track" id="carouselTrack">
+        <img src="photos/1.jpg" alt="The Skylark interior" onerror="this.style.display='none'">
+        <img src="photos/2.jpg" alt="The Skylark bar" onerror="this.style.display='none'">
+        <img src="photos/3.jpg" alt="The Skylark seating" onerror="this.style.display='none'">
+        <img src="photos/4.jpg" alt="The Skylark games area" onerror="this.style.display='none'">
+        <img src="photos/5.jpg" alt="The Skylark exterior" onerror="this.style.display='none'">
+        <img src="photos/6.jpg" alt="The Skylark event setup" onerror="this.style.display='none'">
+      </div>
+      <button class="carousel-btn prev" onclick="carouselMove(-1)" aria-label="Previous photo">&lsaquo;</button>
+      <button class="carousel-btn next" onclick="carouselMove(1)" aria-label="Next photo">&rsaquo;</button>
+      <div class="carousel-dots" id="carouselDots"></div>
+    </div>
+  </section>
+
+  <section id="reviews">
+    <h2>What People Are Saying</h2>
+    <div class="review-badge">
+      <span class="stars">★★★★★</span> 5.0 rating across Google, Facebook &amp; Airbnb —
+      <a href="https://g.page/r/Cbs8JowAKvM8EAE/review" target="_blank">leave us a review</a>
+    </div>
+    <div class="testimonials">
+      <div class="testimonial">
+        <p>Everything was clean, beautifully set up, and the staff kept the whole night running smoothly — couldn't have picked a better spot to celebrate.</p>
+        <span class="reviewer">— Calvin T.</span>
+      </div>
+      <div class="testimonial">
+        <p>Absolutely stunning space, and working with Tim and Ashley was the best part of the whole experience.</p>
+        <span class="reviewer">— Madison M.</span>
+      </div>
+      <div class="testimonial">
+        <p>Hosted our work Christmas party here and loved every bit of it — a great, responsive host and a gorgeous space for photos. We'll definitely book again.</p>
+        <span class="reviewer">— Adleigh P.</span>
+      </div>
+      <div class="testimonial">
+        <p>A super cute, easy-to-work-with space — perfect whether it's a birthday, a holiday party, or anything in between.</p>
+        <span class="reviewer">— Taryn N.</span>
+      </div>
     </div>
   </section>
 
@@ -316,6 +363,51 @@
     });
   }
 
+  // ---- CAROUSEL ----
+  let carouselIndex = 0;
+  const carouselCount = 6;
+
+  function initCarousel(){
+    const dotsEl = document.getElementById('carouselDots');
+    dotsEl.innerHTML = '';
+    for(let i = 0; i < carouselCount; i++){
+      const dot = document.createElement('span');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.onclick = () => carouselGoTo(i);
+      dotsEl.appendChild(dot);
+    }
+
+    const track = document.getElementById('carouselTrack');
+    track.addEventListener('scroll', () => {
+      const newIndex = Math.round(track.scrollLeft / track.clientWidth);
+      if(newIndex !== carouselIndex){
+        carouselIndex = newIndex;
+        updateDots();
+      }
+    });
+  }
+
+  function updateDots(){
+    document.querySelectorAll('#carouselDots .dot').forEach((d, i) => {
+      d.classList.toggle('active', i === carouselIndex);
+    });
+  }
+
+  function carouselGoTo(i){
+    const track = document.getElementById('carouselTrack');
+    carouselIndex = i;
+    track.scrollTo({ left: track.clientWidth * i, behavior: 'smooth' });
+    updateDots();
+  }
+
+  function carouselMove(direction){
+    let newIndex = carouselIndex + direction;
+    if(newIndex < 0) newIndex = carouselCount - 1;
+    if(newIndex >= carouselCount) newIndex = 0;
+    carouselGoTo(newIndex);
+  }
+
+  initCarousel();
   renderCalendar();
 </script>
 </body>
