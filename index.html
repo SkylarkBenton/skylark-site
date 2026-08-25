@@ -85,16 +85,23 @@
   .faq-item.open .faq-icon{ transform:rotate(45deg); }
 
   /* Calendar */
+  .next-weekends{ color:var(--muted); font-size:14px; margin:-6px 0 18px; line-height:1.5; }
+  .next-weekends button{
+    background:none; border:none; padding:0; margin:0; cursor:pointer;
+    color:var(--cream); font:inherit; text-decoration:underline; text-underline-offset:3px;
+  }
+  .next-weekends button:hover{ color:var(--chrome-lt); }
   .month-nav{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
   .month-nav h3{ font-size:18px; margin:0; }
   .nav-btns button{ background:var(--ink-2); border:1px solid var(--line); color:var(--cream); width:34px; height:34px; border-radius:50%; font-size:15px; cursor:pointer; margin-left:8px; }
   .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
   .cal-dow{ text-align:center; font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); padding-bottom:4px; }
-  .cal-day{ background:var(--ink-2); border:1px solid var(--line); border-radius:8px; min-height:50px; padding:6px; font-family:'Oswald',sans-serif; font-size:13px; }
+  .cal-day{ background:var(--ink-2); border:1px solid var(--line); border-radius:8px; min-height:44px; padding:8px 6px; font-family:'Oswald',sans-serif; font-size:13px; }
   .cal-day.empty{ background:transparent; border:none; }
-  .cal-day.taken{ background:rgba(163,30,36,0.18); border-color:rgba(163,30,36,0.4); color:var(--muted); cursor:pointer; }
+  .cal-day.taken{ background:#101012; border-color:rgba(232,232,236,0.04); color:#55555c; cursor:not-allowed; }
+  .cal-day.pending{ background:#101012; border:1px dashed rgba(211,56,64,0.42); color:#6a6a72; cursor:not-allowed; }
   .cal-day.open{ color:var(--chrome-lt); cursor:pointer; }
-  .cal-day.open:hover, .cal-day.taken:hover{ border-color:var(--red-lt); }
+  .cal-day.open:hover{ border-color:rgba(232,232,236,0.28); }
   .cal-day.selected{ box-shadow:inset 0 0 0 1px var(--chrome-lt); }
   .cal-loading{ grid-column:1/-1; text-align:center; padding:32px 8px; color:var(--muted); font-size:12px; letter-spacing:1.5px; text-transform:uppercase; }
   .legend{ display:flex; gap:18px; margin-top:14px; font-size:12px; color:var(--muted); }
@@ -116,6 +123,7 @@
   .msg{ font-size:14px; margin-top:14px; padding:12px 14px; border-radius:8px; display:none; }
   .msg.success{ background:rgba(79,168,160,0.15); color:#8fd6cf; display:block; }
   .msg.error{ background:rgba(217,83,79,0.15); color:#f0938f; display:block; }
+
   .date-rate{ font-family:'Oswald',sans-serif; font-size:16px; letter-spacing:0.5px; color:var(--chrome-lt); margin-top:8px; display:none; }
   .policy-note{ font-size:13px; color:var(--muted); line-height:1.6; margin:0 0 20px; }
 
@@ -223,6 +231,7 @@
 
   <section id="availability">
     <h2>Availability</h2>
+    <p id="nextWeekends" class="next-weekends" hidden></p>
     <div class="month-nav">
       <h3 id="monthLabel">Month Year</h3>
       <div class="nav-btns">
@@ -234,7 +243,8 @@
     <div class="cal-grid" id="calGrid" style="margin-top:6px;"></div>
     <div class="legend">
       <span><i class="dot" style="background:var(--ink-2);border:1px solid var(--line)"></i> Open</span>
-      <span><i class="dot" style="background:var(--red)"></i> Booked</span>
+      <span><i class="dot" style="background:#101012;border:1px dashed rgba(211,56,64,0.5)"></i> Pending</span>
+      <span><i class="dot" style="background:#101012;border:1px solid rgba(232,232,236,0.08)"></i> Booked</span>
     </div>
   </section>
 
@@ -374,6 +384,96 @@
     renderCalendar();
   }
 
+  async function loadAvailability(selectExtra, filters){
+    let q = sb.from('public_availability').select(selectExtra ? 'event_date, end_date, is_pending' : 'event_date, end_date');
+    if(filters && filters.lteEvent) q = q.lte('event_date', filters.lteEvent);
+    if(filters && filters.orEnd) q = q.or(filters.orEnd);
+    return q;
+  }
+
+  async function fetchAvailability(filters){
+    let { data, error } = await loadAvailability(true, filters);
+    if(error){
+      const fallback = await loadAvailability(false, filters);
+      data = fallback.data;
+      error = fallback.error;
+    }
+    if(error){
+      console.error('Could not load availability:', error.message);
+      return [];
+    }
+    return data || [];
+  }
+
+  function occupancyForDate(dateStr, rows){
+    let booked = false;
+    let pending = false;
+    (rows || []).forEach(function(b){
+      const end = b.end_date || b.event_date;
+      if(dateStr >= b.event_date && dateStr <= end){
+        if(b.is_pending) pending = true;
+        else booked = true;
+      }
+    });
+    if(booked) return 'booked';
+    if(pending) return 'pending';
+    return 'open';
+  }
+
+  function pad2(n){ return String(n).padStart(2,'0'); }
+  function isoFromDate(d){
+    return d.getFullYear() + '-' + pad2(d.getMonth()+1) + '-' + pad2(d.getDate());
+  }
+  function addDaysLocal(d, n){
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+  }
+  function formatWeekendLabel(isoDate){
+    return new Date(isoDate + 'T00:00:00').toLocaleDateString('en-US', { month:'short', day:'numeric' });
+  }
+  function nextOpenWeekendDates(from, occupancy, weeks, limit){
+    weeks = weeks || 8;
+    limit = limit || 3;
+    const start = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+    const found = [];
+    const seenWeekend = {};
+    for(let i=0; i<weeks*7 && found.length<limit; i++){
+      const day = addDaysLocal(start, i);
+      const dow = day.getDay();
+      if(dow !== 5 && dow !== 6 && dow !== 0) continue;
+      const iso = isoFromDate(day);
+      if(occupancy(iso) !== 'open') continue;
+      const weekendKey = dow === 0 ? isoFromDate(addDaysLocal(day, -2))
+        : dow === 6 ? isoFromDate(addDaysLocal(day, -1))
+        : iso;
+      if(seenWeekend[weekendKey]) continue;
+      seenWeekend[weekendKey] = true;
+      found.push(iso);
+    }
+    return found;
+  }
+
+  async function renderNextWeekends(){
+    const el = document.getElementById('nextWeekends');
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const horizon = addDaysLocal(today, 8*7 - 1);
+    const rows = await fetchAvailability({
+      lteEvent: isoFromDate(horizon),
+      orEnd: 'end_date.gte.' + isoFromDate(today) + ',end_date.is.null',
+    });
+    const dates = nextOpenWeekendDates(today, function(iso){ return occupancyForDate(iso, rows); });
+    if(!dates.length){
+      el.hidden = true;
+      el.innerHTML = '';
+      return;
+    }
+    const links = dates.map(function(iso){
+      return '<button type="button" onclick="selectOpenDate(\'' + iso + '\')">' + formatWeekendLabel(iso) + '</button>';
+    }).join(', ');
+    el.innerHTML = 'Next open weekends: ' + links;
+    el.hidden = false;
+  }
+
   async function renderCalendar(){
     const requestId = ++calRequestId;
     const month = currentMonth;
@@ -391,28 +491,28 @@
     const monthStart = year + '-' + String(month+1).padStart(2,'0') + '-01';
     const monthEnd = year + '-' + String(month+1).padStart(2,'0') + '-' + String(daysInMonth).padStart(2,'0');
 
-    const { data } = await sb.from('public_availability')
-      .select('event_date, end_date')
-      .lte('event_date', monthEnd)
-      .or('end_date.gte.' + monthStart + ',end_date.is.null');
-
+    const bookings = await fetchAvailability({
+      lteEvent: monthEnd,
+      orEnd: 'end_date.gte.' + monthStart + ',end_date.is.null',
+    });
     if(requestId !== calRequestId) return;
 
-    const bookings = data || [];
     const selected = document.getElementById('i_date').value;
     let html = '';
     for(let i=0;i<firstDay;i++){ html += '<div class="cal-day empty"></div>'; }
 
     for(let day=1; day<=daysInMonth; day++){
       const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
-      const isTaken = bookings.some(b => {
-        const end = b.end_date || b.event_date;
-        return dateStr >= b.event_date && dateStr <= end;
-      });
+      const occ = occupancyForDate(dateStr, bookings);
       const selectedClass = selected === dateStr ? ' selected' : '';
-      html += '<div class="cal-day ' + (isTaken ? 'taken' : 'open') + selectedClass + '" role="button" tabindex="0" data-date="' + dateStr + '" onclick="selectCalendarDate(\'' + dateStr + '\')" onkeydown="calendarDayKey(event,\'' + dateStr + '\')">' + day + (isTaken ? '' : '<div style="font-size:10px;color:var(--muted);margin-top:2px;">$' + priceForDate(dateStr) + '</div>') + '</div>';
+      if(occ === 'booked'){
+        html += '<div class="cal-day taken" title="Booked">' + day + '</div>';
+      } else if(occ === 'pending'){
+        html += '<div class="cal-day pending" title="Pending hold">' + day + '</div>';
+      } else {
+        html += '<div class="cal-day open' + selectedClass + '" data-date="' + dateStr + '" role="button" tabindex="0" title="Available — click to inquire" onclick="selectOpenDate(\'' + dateStr + '\')" onkeydown="calendarDayKey(event,\'' + dateStr + '\')">' + day + '</div>';
+      }
     }
-
     document.getElementById('monthLabel').textContent = MONTHS[month] + ' ' + year;
     grid.innerHTML = html;
     grid.removeAttribute('aria-busy');
@@ -421,21 +521,15 @@
   function calendarDayKey(event, dateStr){
     if(event.key === 'Enter' || event.key === ' '){
       event.preventDefault();
-      selectCalendarDate(dateStr);
+      selectOpenDate(dateStr);
     }
   }
 
-  function selectCalendarDate(dateStr){
-    document.getElementById('i_date').value = dateStr;
-    document.querySelectorAll('#calGrid .cal-day.selected').forEach(el => el.classList.remove('selected'));
-    const cell = document.querySelector('#calGrid .cal-day[data-date="' + dateStr + '"]');
-    if(cell) cell.classList.add('selected');
-    checkDateAvailability();
-    document.getElementById('inquire').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  let selectedDateIsTaken = false;
 
   function updateDateRate(dateStr){
     const rateEl = document.getElementById('dateRate');
+    if(!rateEl) return;
     if(!dateStr){
       rateEl.style.display = 'none';
       rateEl.textContent = '';
@@ -446,7 +540,15 @@
     rateEl.textContent = (price === 500 ? 'Weekend rate: $500' : 'Weekday rate: $350');
   }
 
-  let selectedDateIsTaken = false;
+  function selectOpenDate(dateStr){
+    const input = document.getElementById('i_date');
+    input.value = dateStr;
+    document.querySelectorAll('#calGrid .cal-day.selected').forEach(el => el.classList.remove('selected'));
+    const cell = document.querySelector('#calGrid .cal-day[data-date="' + dateStr + '"]');
+    if(cell) cell.classList.add('selected');
+    checkDateAvailability();
+    document.getElementById('inquire').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   async function checkDateAvailability(){
     const dateStr = document.getElementById('i_date').value;
@@ -455,23 +557,23 @@
     updateDateRate(dateStr);
     if(!dateStr){ msgEl.textContent = ''; return; }
 
-    const { data } = await sb.from('public_availability')
-      .select('event_date, end_date')
-      .lte('event_date', dateStr)
-      .or('end_date.gte.' + dateStr + ',end_date.is.null');
-
-    const taken = (data || []).some(b => {
-      const end = b.end_date || b.event_date;
-      return dateStr >= b.event_date && dateStr <= end;
+    const bookings = await fetchAvailability({
+      lteEvent: dateStr,
+      orEnd: 'end_date.gte.' + dateStr + ',end_date.is.null',
     });
+    const occ = occupancyForDate(dateStr, bookings);
 
-    if(taken){
+    if(occ === 'booked'){
       selectedDateIsTaken = true;
       msgEl.style.color = '#f0938f';
       msgEl.textContent = 'That date is already booked — pick another date, or submit anyway if you\u2019d like to be notified of cancellations.';
+    } else if(occ === 'pending'){
+      selectedDateIsTaken = true;
+      msgEl.style.color = '#f0938f';
+      msgEl.textContent = 'That date is on a short hold for another inquiry. You can still submit as a waitlist.';
     } else {
       msgEl.style.color = '#8fd6cf';
-      msgEl.textContent = 'That date is open.';
+      msgEl.textContent = 'That date is open. Estimated price: $' + priceForDate(dateStr) + '.';
     }
   }
 
@@ -521,6 +623,12 @@
       msgEl.className = 'msg error';
       msgEl.textContent = 'Something went wrong — please call or message us directly.';
       return;
+    }
+
+    try {
+      await sb.functions.invoke('notify-inquiry', { body: payload });
+    } catch (e) {
+      console.warn('Inquiry email notify failed (database trigger may still send):', e);
     }
 
     msgEl.className = 'msg success';
@@ -584,6 +692,7 @@
 
   initCarousel();
   renderCalendar();
+  renderNextWeekends();
 </script>
 </body>
 </html>
