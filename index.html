@@ -30,9 +30,20 @@
   nav a{ color:var(--muted); text-decoration:none; margin-left:22px; font-size:13px; letter-spacing:1px; text-transform:uppercase; }
   nav a:hover{ color:var(--cream); }
 
-  .hero{ text-align:center; padding:60px 0 40px; }
-  .hero h1{ font-size:38px; margin:0 0 14px; color:var(--chrome-lt); }
-  .hero p{ color:var(--muted); font-size:16px; max-width:560px; margin:0 auto 28px; }
+  .hero{
+    text-align:center; padding:80px 24px 72px; min-height:460px;
+    border-radius:14px; overflow:hidden; position:relative;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:
+      linear-gradient(180deg, rgba(11,11,12,0.46) 0%, rgba(11,11,12,0.82) 100%),
+      url('photos/1.jpg') center/cover no-repeat;
+    border:1px solid var(--line); border-top:1px solid var(--line);
+  }
+  section.hero{ border-top:none; }
+  .hero .btn.ghost{ border-color:rgba(242,242,244,0.35); }
+  @media(max-width:600px){ .hero{ min-height:360px; padding:56px 18px 48px; } }
+  .hero h1{ font-size:38px; margin:0 0 14px; color:var(--chrome-lt); text-shadow:0 2px 18px rgba(0,0,0,0.5); }
+  .hero p{ color:#c9c9cc; font-size:16px; max-width:560px; margin:0 auto 28px; }
   .btn{ display:inline-block; padding:14px 30px; border-radius:30px; font-weight:600; text-decoration:none; font-family:'Work Sans',sans-serif; font-size:14px; letter-spacing:0.5px; }
   .btn.primary{ background:var(--red); color:var(--chrome-lt); }
   .btn.ghost{ border:1px solid var(--line); color:var(--cream); margin-left:10px; }
@@ -81,8 +92,11 @@
   .cal-dow{ text-align:center; font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); padding-bottom:4px; }
   .cal-day{ background:var(--ink-2); border:1px solid var(--line); border-radius:8px; min-height:50px; padding:6px; font-family:'Oswald',sans-serif; font-size:13px; }
   .cal-day.empty{ background:transparent; border:none; }
-  .cal-day.taken{ background:rgba(163,30,36,0.18); border-color:rgba(163,30,36,0.4); color:var(--muted); }
-  .cal-day.open{ color:var(--chrome-lt); }
+  .cal-day.taken{ background:rgba(163,30,36,0.18); border-color:rgba(163,30,36,0.4); color:var(--muted); cursor:pointer; }
+  .cal-day.open{ color:var(--chrome-lt); cursor:pointer; }
+  .cal-day.open:hover, .cal-day.taken:hover{ border-color:var(--red-lt); }
+  .cal-day.selected{ box-shadow:inset 0 0 0 1px var(--chrome-lt); }
+  .cal-loading{ grid-column:1/-1; text-align:center; padding:32px 8px; color:var(--muted); font-size:12px; letter-spacing:1.5px; text-transform:uppercase; }
   .legend{ display:flex; gap:18px; margin-top:14px; font-size:12px; color:var(--muted); }
   .legend span{ display:inline-flex; align-items:center; gap:6px; }
   .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
@@ -102,9 +116,14 @@
   .msg{ font-size:14px; margin-top:14px; padding:12px 14px; border-radius:8px; display:none; }
   .msg.success{ background:rgba(79,168,160,0.15); color:#8fd6cf; display:block; }
   .msg.error{ background:rgba(217,83,79,0.15); color:#f0938f; display:block; }
+  .date-rate{ font-family:'Oswald',sans-serif; font-size:16px; letter-spacing:0.5px; color:var(--chrome-lt); margin-top:8px; display:none; }
+  .policy-note{ font-size:13px; color:var(--muted); line-height:1.6; margin:0 0 20px; }
 
-  footer{ padding:40px 0; text-align:center; color:var(--muted); font-size:13px; }
+  footer{ padding:40px 0; text-align:center; color:var(--muted); font-size:13px; border-top:1px solid var(--line); }
   footer a{ color:var(--muted); }
+  footer a:hover{ color:var(--cream); }
+  .footer-links{ margin-top:14px; display:flex; justify-content:center; gap:14px; flex-wrap:wrap; }
+  .footer-links a{ letter-spacing:1px; text-transform:uppercase; font-size:11px; text-decoration:none; }
 </style>
 <script type="application/ld+json">
 {
@@ -163,12 +182,12 @@
     <h2>The Space</h2>
     <div class="carousel">
       <div class="carousel-track" id="carouselTrack">
-        <img src="photos/1.jpg" alt="The Skylark interior" onerror="this.style.display='none'">
-        <img src="photos/2.jpg" alt="The Skylark bar" onerror="this.style.display='none'">
-        <img src="photos/3.jpg" alt="The Skylark seating" onerror="this.style.display='none'">
-        <img src="photos/4.jpg" alt="The Skylark games area" onerror="this.style.display='none'">
-        <img src="photos/5.jpg" alt="The Skylark exterior" onerror="this.style.display='none'">
-        <img src="photos/6.jpg" alt="The Skylark event setup" onerror="this.style.display='none'">
+        <img src="photos/1.jpg" alt="The Skylark interior" loading="lazy" onerror="this.style.display='none'">
+        <img src="photos/2.jpg" alt="The Skylark bar" loading="lazy" onerror="this.style.display='none'">
+        <img src="photos/3.jpg" alt="The Skylark seating" loading="lazy" onerror="this.style.display='none'">
+        <img src="photos/4.jpg" alt="The Skylark games area" loading="lazy" onerror="this.style.display='none'">
+        <img src="photos/5.jpg" alt="The Skylark exterior" loading="lazy" onerror="this.style.display='none'">
+        <img src="photos/6.jpg" alt="The Skylark event setup" loading="lazy" onerror="this.style.display='none'">
       </div>
       <button class="carousel-btn prev" onclick="carouselMove(-1)" aria-label="Previous photo">&lsaquo;</button>
       <button class="carousel-btn next" onclick="carouselMove(1)" aria-label="Next photo">&rsaquo;</button>
@@ -268,6 +287,7 @@
   <section id="inquire">
     <h2>Request a Date</h2>
     <p style="color:var(--muted);font-size:14px;margin-top:-10px;">Submit a request and we'll follow up to confirm — this doesn't book the date automatically.</p>
+    <p class="policy-note">A 50% deposit is charged at signing, a $250 refundable damage hold hits a few days before your event, and rescheduling is free with 7+ days' notice. <a href="terms.html">Full terms</a></p>
 
     <div class="field"><label>Name</label><input type="text" id="i_name" required></div>
     <div class="row2">
@@ -287,12 +307,13 @@
           <option value="Other">Other</option>
         </select>
       </div>
-      <div class="field"><label>Guest Count</label><input type="number" id="i_guests" min="1" required></div>
+      <div class="field"><label>Guest Count</label><input type="number" id="i_guests" min="1" max="50" required></div>
     </div>
     <div class="field">
       <label>Requested Date</label>
       <input type="date" id="i_date" onchange="checkDateAvailability()" required>
       <div id="dateCheckMsg" style="font-size:12px;margin-top:6px;"></div>
+      <div id="dateRate" class="date-rate"></div>
     </div>
     <div class="field"><label>How Did You Hear About Us?</label>
       <select id="i_heard_about">
@@ -306,7 +327,7 @@
         <option value="Other">Other</option>
       </select>
     </div>
-    <div class="field"><label>Message</label><textarea id="i_message" placeholder="Anything else we should know?" required></textarea></div>
+    <div class="field"><label>Message <span style="text-transform:none;letter-spacing:0;">(optional)</span></label><textarea id="i_message" placeholder="Anything else we should know?"></textarea></div>
 
     <div class="submit-row">
       <button class="btn primary" style="border:none;cursor:pointer;" onclick="submitInquiry()" id="submitBtn">Submit Request</button>
@@ -315,8 +336,16 @@
   </section>
 
   <footer>
-    <div>The Skylark &middot; Benton, LA</div>
-    <div style="margin-top:6px;"><a href="tel:3183445001">(318) 344-5001</a></div>
+    <div class="brand" style="font-size:18px;margin-bottom:10px;">The Skylark</div>
+    <div>
+      <a href="https://www.google.com/maps/search/?api=1&query=118+5th+St+Ste+2C,+Benton,+LA+71006" target="_blank" rel="noopener">118 5th St Ste 2C, Benton, LA 71006</a>
+    </div>
+    <div style="margin-top:8px;"><a href="tel:3183445001">(318) 344-5001</a></div>
+    <div class="footer-links">
+      <a href="https://www.instagram.com/theskylarkbenton/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.airbnb.com/h/skylarkbenton" target="_blank" rel="noopener">Airbnb</a>
+      <a href="https://www.google.com/maps/search/?api=1&query=118+5th+St+Ste+2C,+Benton,+LA+71006" target="_blank" rel="noopener">Google Maps</a>
+    </div>
   </footer>
 </div>
 
@@ -336,6 +365,8 @@
     return (day === 0 || day === 5 || day === 6) ? 500 : 350;
   }
 
+  let calRequestId = 0;
+
   function changeMonth(delta){
     currentMonth += delta;
     if(currentMonth < 0){ currentMonth = 11; currentYear--; }
@@ -344,34 +375,75 @@
   }
 
   async function renderCalendar(){
-    document.getElementById('monthLabel').textContent = MONTHS[currentMonth] + ' ' + currentYear;
+    const requestId = ++calRequestId;
+    const month = currentMonth;
+    const year = currentYear;
+
     const dowRow = document.getElementById('dowRow');
     dowRow.innerHTML = DOWS.map(d => '<div class="cal-dow">' + d + '</div>').join('');
 
-    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-    const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
-    const monthStart = currentYear + '-' + String(currentMonth+1).padStart(2,'0') + '-01';
-    const monthEnd = currentYear + '-' + String(currentMonth+1).padStart(2,'0') + '-' + String(daysInMonth).padStart(2,'0');
+    const grid = document.getElementById('calGrid');
+    grid.setAttribute('aria-busy', 'true');
+    grid.innerHTML = '<div class="cal-loading">Loading availability…</div>';
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month+1, 0).getDate();
+    const monthStart = year + '-' + String(month+1).padStart(2,'0') + '-01';
+    const monthEnd = year + '-' + String(month+1).padStart(2,'0') + '-' + String(daysInMonth).padStart(2,'0');
 
     const { data } = await sb.from('public_availability')
       .select('event_date, end_date')
       .lte('event_date', monthEnd)
       .or('end_date.gte.' + monthStart + ',end_date.is.null');
 
+    if(requestId !== calRequestId) return;
+
     const bookings = data || [];
-    const grid = document.getElementById('calGrid');
+    const selected = document.getElementById('i_date').value;
     let html = '';
     for(let i=0;i<firstDay;i++){ html += '<div class="cal-day empty"></div>'; }
 
     for(let day=1; day<=daysInMonth; day++){
-      const dateStr = currentYear + '-' + String(currentMonth+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+      const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
       const isTaken = bookings.some(b => {
         const end = b.end_date || b.event_date;
         return dateStr >= b.event_date && dateStr <= end;
       });
-      html += '<div class="cal-day ' + (isTaken ? 'taken' : 'open') + '">' + day + (isTaken ? '' : '<div style="font-size:10px;color:var(--muted);margin-top:2px;">$' + priceForDate(dateStr) + '</div>') + '</div>';
+      const selectedClass = selected === dateStr ? ' selected' : '';
+      html += '<div class="cal-day ' + (isTaken ? 'taken' : 'open') + selectedClass + '" role="button" tabindex="0" data-date="' + dateStr + '" onclick="selectCalendarDate(\'' + dateStr + '\')" onkeydown="calendarDayKey(event,\'' + dateStr + '\')">' + day + (isTaken ? '' : '<div style="font-size:10px;color:var(--muted);margin-top:2px;">$' + priceForDate(dateStr) + '</div>') + '</div>';
     }
+
+    document.getElementById('monthLabel').textContent = MONTHS[month] + ' ' + year;
     grid.innerHTML = html;
+    grid.removeAttribute('aria-busy');
+  }
+
+  function calendarDayKey(event, dateStr){
+    if(event.key === 'Enter' || event.key === ' '){
+      event.preventDefault();
+      selectCalendarDate(dateStr);
+    }
+  }
+
+  function selectCalendarDate(dateStr){
+    document.getElementById('i_date').value = dateStr;
+    document.querySelectorAll('#calGrid .cal-day.selected').forEach(el => el.classList.remove('selected'));
+    const cell = document.querySelector('#calGrid .cal-day[data-date="' + dateStr + '"]');
+    if(cell) cell.classList.add('selected');
+    checkDateAvailability();
+    document.getElementById('inquire').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function updateDateRate(dateStr){
+    const rateEl = document.getElementById('dateRate');
+    if(!dateStr){
+      rateEl.style.display = 'none';
+      rateEl.textContent = '';
+      return;
+    }
+    const price = priceForDate(dateStr);
+    rateEl.style.display = 'block';
+    rateEl.textContent = (price === 500 ? 'Weekend rate: $500' : 'Weekday rate: $350');
   }
 
   let selectedDateIsTaken = false;
@@ -380,6 +452,7 @@
     const dateStr = document.getElementById('i_date').value;
     const msgEl = document.getElementById('dateCheckMsg');
     selectedDateIsTaken = false;
+    updateDateRate(dateStr);
     if(!dateStr){ msgEl.textContent = ''; return; }
 
     const { data } = await sb.from('public_availability')
@@ -398,7 +471,7 @@
       msgEl.textContent = 'That date is already booked — pick another date, or submit anyway if you\u2019d like to be notified of cancellations.';
     } else {
       msgEl.style.color = '#8fd6cf';
-      msgEl.textContent = 'That date is open. Estimated price: $' + priceForDate(dateStr) + '.';
+      msgEl.textContent = 'That date is open.';
     }
   }
 
@@ -412,9 +485,16 @@
     const message = document.getElementById('i_message').value.trim();
     const msgEl = document.getElementById('formMsg');
 
-    if(!name || !email || !phone || !eventType || !guestCount || !requestedDate || !message){
+    if(!name || !email || !phone || !eventType || !guestCount || !requestedDate){
       msgEl.className = 'msg error';
-      msgEl.textContent = 'Please fill in every field so we have what we need to review your request.';
+      msgEl.textContent = 'Please fill in your name, email, phone, event type, guest count, and date.';
+      return;
+    }
+
+    const guests = parseInt(guestCount, 10);
+    if(isNaN(guests) || guests < 1 || guests > 50){
+      msgEl.className = 'msg error';
+      msgEl.textContent = 'Guest count must be between 1 and 50.';
       return;
     }
 
@@ -427,10 +507,10 @@
       email: email,
       phone: phone,
       event_type: eventType,
-      guest_count: parseInt(guestCount),
+      guest_count: guests,
       requested_date: requestedDate,
       heard_about: document.getElementById('i_heard_about').value || null,
-      message: message,
+      message: message || null,
     };
 
     const { error } = await sb.from('inquiries').insert(payload);
@@ -448,6 +528,9 @@
     ['i_name','i_email','i_phone','i_event','i_guests','i_date','i_heard_about','i_message'].forEach(id => {
       document.getElementById(id).value = '';
     });
+    document.getElementById('dateCheckMsg').textContent = '';
+    updateDateRate('');
+    document.querySelectorAll('#calGrid .cal-day.selected').forEach(el => el.classList.remove('selected'));
   }
 
   // ---- CAROUSEL ----
