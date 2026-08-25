@@ -50,7 +50,7 @@ END:VEVENT
 END:VCALENDAR
 `;
   const events = parseAirbnbIcal(folded);
-  assert.equal(events[0].summary, 'A longsummary');
+  assert.equal(events[0].summary, 'A long summary');
 });
 
 test('rejects non-calendar bodies (fail closed)', () => {
