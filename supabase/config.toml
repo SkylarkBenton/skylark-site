@@ -3,6 +3,9 @@ project_id = "rywomhsgcaighcwnftoa"
 [functions.notify-inquiry]
 verify_jwt = true
 
+[functions.notify-host-paid]
+verify_jwt = true
+
 [functions.sync-airbnb-ical]
 verify_jwt = false
 

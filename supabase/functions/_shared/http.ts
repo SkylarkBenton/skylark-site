@@ -32,6 +32,10 @@ export function siteUrl() {
   return (Deno.env.get('SITE_URL') || 'https://www.skylarkbenton.com').replace(/\/$/, '');
 }
 
+export function bookingDeskUrl() {
+  return (Deno.env.get('BOOKING_DESK_URL') || 'https://skylarkbooking.vercel.app').replace(/\/$/, '');
+}
+
 export function serviceClient() {
   const url = Deno.env.get('SUPABASE_URL') || '';
   const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
