@@ -18,7 +18,7 @@ async function invoke(name) {
   const res = await fetch(`${SUPABASE_URL}/functions/v1/${name}`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${CRON || ANON}`,
+      Authorization: `Bearer ${ANON}`,
       apikey: ANON,
       'x-cron-secret': CRON,
       'Content-Type': 'application/json',
@@ -39,10 +39,7 @@ export async function GET(req) {
   if (!authorized(req)) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  const [sync, expire] = await Promise.all([
-    invoke('sync-airbnb-ical'),
-    invoke('expire-pending-holds'),
-  ]);
-  const ok = sync.status < 500 && expire.status < 500;
-  return Response.json({ ok, sync, expire }, { status: ok ? 200 : 502 });
+  const sync = await invoke('sync-airbnb-ts');
+  const ok = sync.status < 400;
+  return Response.json({ ok, sync }, { status: ok ? 200 : 502 });
 }
