@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.117.2';
 import { fetchIcalWithRetry, parseAirbnbIcal } from '../_shared/ical.ts';
 import { planAirbnbSync, type BookingRow } from '../_shared/sync.ts';
 import { cronAuthorized, handleCors, json, serviceClient } from '../_shared/http.ts';

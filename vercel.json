@@ -4,5 +4,13 @@
       "path": "/api/cron/hourly",
       "schedule": "0 14 * * *"
     }
+  ],
+  "redirects": [
+    { "source": "/book", "destination": "/#inquire", "permanent": false },
+    { "source": "/book/", "destination": "/#inquire", "permanent": false },
+    { "source": "/booking", "destination": "/#inquire", "permanent": false },
+    { "source": "/booking/", "destination": "/#inquire", "permanent": false },
+    { "source": "/inquire", "destination": "/#inquire", "permanent": false },
+    { "source": "/inquire/", "destination": "/#inquire", "permanent": false }
   ]
 }

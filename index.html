@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <title>The Skylark — Private Event Venue in Benton, LA</title>
 <meta name="description" content="Private event venue in Benton, LA for parties, showers, and celebrations up to 50 guests. Bar setup (BYOB), seating, and games. Close to Shreveport and Bossier.">
 <link rel="canonical" href="https://www.skylarkbenton.com/">
@@ -12,7 +15,7 @@
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://www.skylarkbenton.com/photos/1.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Limelight&family=Oswald:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <style>
   :root{
     --ink:#0B0B0C; --ink-2:#161618; --ink-3:#1E1E21;
@@ -182,7 +185,8 @@
     "closes": "00:00"
   },
   "sameAs": [
-    "https://www.instagram.com/theskylarkbenton/"
+    "https://www.instagram.com/theskylarkbenton/",
+    "https://www.facebook.com/skylarkbenton/"
   ]
 }
 </script>
@@ -389,6 +393,7 @@
     <div style="margin-top:8px;"><a href="tel:3183445001">(318) 344-5001</a></div>
     <div class="footer-links">
       <a href="https://www.instagram.com/theskylarkbenton/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.facebook.com/skylarkbenton/" target="_blank" rel="noopener">Facebook</a>
       <a href="https://www.airbnb.com/h/skylarkbenton" target="_blank" rel="noopener">Airbnb</a>
       <a href="https://www.google.com/maps/search/?api=1&query=118+5th+St+Ste+2C,+Benton,+LA+71006" target="_blank" rel="noopener">Google Maps</a>
     </div>
@@ -430,6 +435,7 @@
   async function fetchAvailability(filters){
     let { data, error } = await loadAvailability(true, filters);
     if(error){
+      console.warn('public_availability query with is_pending failed; pending dates will not be marked until that column exists:', error.message);
       const fallback = await loadAvailability(false, filters);
       data = fallback.data;
       error = fallback.error;
