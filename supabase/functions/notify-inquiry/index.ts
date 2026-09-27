@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.117.2';
 import { sendEmail, wrapHtml } from '../_shared/email.ts';
 import { handleCors, json, serviceClient, siteUrl } from '../_shared/http.ts';
 

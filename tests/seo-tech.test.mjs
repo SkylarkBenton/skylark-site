@@ -7,6 +7,16 @@ const root = resolve(import.meta.dirname, '..');
 const html = readFileSync(resolve(root, 'index.html'), 'utf8');
 const robots = readFileSync(resolve(root, 'robots.txt'), 'utf8');
 const sitemap = readFileSync(resolve(root, 'sitemap.xml'), 'utf8');
+const vercel = JSON.parse(readFileSync(resolve(root, 'vercel.json'), 'utf8'));
+
+const FACEBOOK = 'https://www.facebook.com/skylarkbenton/';
+const INSTAGRAM = 'https://www.instagram.com/theskylarkbenton/';
+const SUPABASE_UMD = 'https://unpkg.com/@supabase/supabase-js@2.117.2/dist/umd/supabase.js';
+const FAVICON_LINKS = [
+  '<link rel="icon" href="/favicon.ico" sizes="any">',
+  '<link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32">',
+  '<link rel="apple-touch-icon" href="/apple-touch-icon.png">',
+];
 
 const TITLE = 'The Skylark — Private Event Venue in Benton, LA';
 const META =
@@ -79,5 +89,55 @@ test('homepage keeps FAQ schema and adds EventVenue + LocalBusiness JSON-LD', ()
   assert.equal(venue.maximumAttendeeCapacity, 50);
   assert.equal(venue.openingHoursSpecification.opens, '12:00');
   assert.equal(venue.openingHoursSpecification.closes, '00:00');
-  assert.deepEqual(venue.sameAs, ['https://www.instagram.com/theskylarkbenton/']);
+  assert.deepEqual(venue.sameAs, [INSTAGRAM, FACEBOOK]);
+});
+
+test('footer social links include Facebook beside Instagram', () => {
+  const footer = html.slice(html.indexOf('class="footer-links"'));
+  assert.match(
+    footer,
+    new RegExp(
+      `<a href="${INSTAGRAM}" target="_blank" rel="noopener">Instagram</a>\\s*` +
+        `<a href="${FACEBOOK}" target="_blank" rel="noopener">Facebook</a>`,
+    ),
+  );
+});
+
+test('public pages link the Skylark badge favicon', () => {
+  for (const file of ['index.html', 'terms.html', 'agreement.html', 'approve.html']) {
+    const page = readFileSync(resolve(root, file), 'utf8');
+    for (const tag of FAVICON_LINKS) {
+      assert.ok(page.includes(tag), `${file} is missing ${tag}`);
+    }
+  }
+});
+
+test('browser pages pin supabase-js to 2.117.2', () => {
+  for (const file of ['index.html', 'agreement.html', 'approve.html']) {
+    const page = readFileSync(resolve(root, file), 'utf8');
+    assert.match(page, new RegExp(`<script src="${SUPABASE_UMD.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"></script>`));
+    assert.doesNotMatch(page, /supabase-js@2\/dist\/umd\/supabase\.js/);
+  }
+  for (const file of [
+    'supabase/functions/expire-pending-holds/index.ts',
+    'supabase/functions/notify-inquiry/index.ts',
+    'supabase/functions/notify-host-paid/index.ts',
+    'supabase/functions/sync-airbnb-ical/index.ts',
+  ]) {
+    const source = readFileSync(resolve(root, file), 'utf8');
+    assert.match(source, /https:\/\/esm\.sh\/@supabase\/supabase-js@2\.117\.2/);
+    assert.doesNotMatch(source, /supabase-js@2['"]/);
+  }
+});
+
+test('booking path aliases redirect to the inquire section', () => {
+  assert.deepEqual(vercel.crons, [{ path: '/api/cron/hourly', schedule: '0 14 * * *' }]);
+  const sources = ['/book', '/book/', '/booking', '/booking/', '/inquire', '/inquire/'];
+  assert.equal(vercel.redirects.length, sources.length);
+  for (const source of sources) {
+    const rule = vercel.redirects.find((entry) => entry.source === source);
+    assert.ok(rule, `missing redirect for ${source}`);
+    assert.equal(rule.destination, '/#inquire');
+    assert.equal(rule.permanent, false);
+  }
 });
