@@ -506,6 +506,8 @@
   }
 
   function occupancyForDate(dateStr, rows){
+    // public_availability.end_date is the last inclusive occupied night
+    // (Airbnb checkout / DTEND is not included).
     let booked = false;
     let pending = false;
     (rows || []).forEach(function(b){
