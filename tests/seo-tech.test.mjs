@@ -64,7 +64,7 @@ test('homepage has canonical and Open Graph tags using approved copy', () => {
   assert.match(html, new RegExp(`<meta property="og:description" content="${META.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}">`));
   assert.match(html, /<meta property="og:url" content="https:\/\/www\.skylarkbenton\.com\/">/);
   assert.match(html, /<meta property="og:type" content="website">/);
-  assert.match(html, /<meta property="og:image" content="https:\/\/www\.skylarkbenton\.com\/photos\/1\.jpg">/);
+  assert.match(html, /<meta property="og:image" content="https:\/\/www\.skylarkbenton\.com\/photos\/skylark-sue80-marquee-16x9\.jpg">/);
 });
 
 test('homepage keeps FAQ schema and adds EventVenue + LocalBusiness JSON-LD', () => {

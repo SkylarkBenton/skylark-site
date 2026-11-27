@@ -13,7 +13,7 @@
 <meta property="og:description" content="Private event venue in Benton, LA for parties, showers, and celebrations up to 50 guests. Bar setup (BYOB), seating, and games. Close to Shreveport and Bossier.">
 <meta property="og:url" content="https://www.skylarkbenton.com/">
 <meta property="og:type" content="website">
-<meta property="og:image" content="https://www.skylarkbenton.com/photos/1.jpg">
+<meta property="og:image" content="https://www.skylarkbenton.com/photos/skylark-sue80-marquee-16x9.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Limelight&family=Oswald:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <style>
@@ -43,14 +43,23 @@
     text-align:center; padding:80px 24px 72px; min-height:460px;
     border-radius:14px; overflow:hidden; position:relative;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
-    background:
-      linear-gradient(180deg, rgba(11,11,12,0.46) 0%, rgba(11,11,12,0.82) 100%),
-      url('photos/1.jpg') center/cover no-repeat;
+    background:var(--ink);
     border:1px solid var(--line); border-top:1px solid var(--line);
   }
+  .hero-media, .hero-img{
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; z-index:0;
+  }
+  .hero-media{ display:block; }
+  .hero::after{
+    content:"";
+    position:absolute; inset:0; z-index:1; pointer-events:none;
+    background:linear-gradient(180deg, rgba(11,11,12,0.46) 0%, rgba(11,11,12,0.82) 100%);
+  }
+  .hero > *:not(.hero-media){ position:relative; z-index:2; }
   section.hero{ border-top:none; }
   .hero .btn.ghost{ border-color:rgba(242,242,244,0.35); }
-  @media(max-width:600px){ .hero{ min-height:360px; padding:56px 18px 48px; } }
+  @media(max-width:600px){ .hero{ min-height:420px; padding:56px 18px 48px; } }
   .hero h1{ font-size:38px; margin:0 0 14px; color:var(--chrome-lt); text-shadow:0 2px 18px rgba(0,0,0,0.5); }
   .hero p{ color:#c9c9cc; font-size:16px; max-width:560px; margin:0 auto 12px; }
   .hero p:last-of-type{ margin-bottom:28px; }
@@ -69,8 +78,16 @@
   .carousel{ position:relative; border-radius:14px; overflow:hidden; border:1px solid var(--line); background:var(--ink-2); }
   .carousel-track{ display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; }
   .carousel-track::-webkit-scrollbar{ display:none; }
-  .carousel-track img{ flex:0 0 100%; scroll-snap-align:start; width:100%; height:420px; object-fit:cover; display:block; }
-  @media(max-width:600px){ .carousel-track img{ height:260px; } }
+  .carousel-track img, .carousel-track picture{
+    flex:0 0 100%; scroll-snap-align:start; width:100%; height:420px; object-fit:cover; display:block;
+  }
+  .carousel-track picture img{ flex:none; width:100%; height:100%; object-fit:cover; display:block; }
+  @media(max-width:600px){ .carousel-track img, .carousel-track picture{ height:260px; } }
+  .feature-photo{ border-radius:14px; overflow:hidden; border:1px solid var(--line); background:var(--ink-2); }
+  .feature-photo picture, .feature-photo img{ display:block; width:100%; height:auto; }
+  .feature-photo img{ width:100%; height:auto; object-fit:cover; aspect-ratio:16/9; }
+  @media(max-width:600px){ .feature-photo img{ aspect-ratio:4/5; } }
+  .photo-credit{ font-size:12px; color:var(--muted); margin:10px 0 0; letter-spacing:0.4px; }
   .carousel-btn{ position:absolute; top:50%; transform:translateY(-50%); background:rgba(11,11,12,0.6); color:var(--chrome-lt); border:1px solid var(--line); width:40px; height:40px; border-radius:50%; font-size:20px; cursor:pointer; }
   .carousel-btn.prev{ left:12px; }
   .carousel-btn.next{ right:12px; }
@@ -169,7 +186,7 @@
   "description": "Private event venue in Benton, LA for parties, showers, and celebrations up to 50 guests. Bar setup (BYOB), seating, and games. Close to Shreveport and Bossier.",
   "url": "https://www.skylarkbenton.com/",
   "telephone": "+13183445001",
-  "image": "https://www.skylarkbenton.com/photos/1.jpg",
+  "image": "https://www.skylarkbenton.com/photos/skylark-sue80-marquee-16x9.jpg",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "118 5th St Ste 2C",
@@ -209,6 +226,10 @@
   </header>
 
   <section class="hero">
+    <picture class="hero-media">
+      <source media="(max-width: 600px)" srcset="photos/skylark-sue80-marquee-4x5.jpg" width="1600" height="2000">
+      <img class="hero-img" src="photos/skylark-sue80-marquee-16x9.jpg" width="2400" height="1350" alt="SUE marquee lights at an 80th birthday party at Skylark">
+    </picture>
     <h1>Private Event Venue<br>Benton, Louisiana</h1>
     <p>The Skylark is a private space for parties, showers, and celebrations for up to 50 guests — a fully equipped bar area (BYOB), plenty of seating, and games.</p>
     <p>A short drive from Shreveport and Bossier City. Same Benton spot — up to 50 guests, bar setup (BYOB), seating, and games.</p>
@@ -226,6 +247,17 @@
     </div>
   </section>
 
+  <section id="celebrations">
+    <h2>Birthdays &amp; Private Parties</h2>
+    <div class="feature-photo">
+      <picture>
+        <source media="(max-width: 600px)" srcset="photos/skylark-sue80-cake-4x5.jpg" width="1600" height="2000">
+        <img src="photos/skylark-sue80-cake-16x9.jpg" width="2400" height="1350" alt="Candlelit birthday cake at an 80th birthday party at Skylark" loading="lazy">
+      </picture>
+    </div>
+    <p class="photo-credit">Photo by Kaylin Hermes</p>
+  </section>
+
   <section id="gallery">
     <h2>The Space</h2>
     <div class="carousel">
@@ -236,6 +268,18 @@
         <img src="photos/4.jpg" alt="The Skylark games area" loading="lazy" onerror="this.style.display='none'">
         <img src="photos/5.jpg" alt="The Skylark exterior" loading="lazy" onerror="this.style.display='none'">
         <img src="photos/6.jpg" alt="The Skylark event setup" loading="lazy" onerror="this.style.display='none'">
+        <picture>
+          <source media="(max-width: 600px)" srcset="photos/skylark-sue80-dance-4x5.jpg" width="1080" height="1350">
+          <img src="photos/skylark-sue80-dance-16x9.jpg" width="2400" height="1350" alt="Guests dancing at a private event at Skylark" loading="lazy" onerror="this.style.display='none'">
+        </picture>
+        <picture>
+          <source media="(max-width: 600px)" srcset="photos/skylark-sue80-cake-4x5.jpg" width="1600" height="2000">
+          <img src="photos/skylark-sue80-cake-16x9.jpg" width="2400" height="1350" alt="Candlelit birthday cake at an 80th birthday party at Skylark" loading="lazy" onerror="this.style.display='none'">
+        </picture>
+        <picture>
+          <source media="(max-width: 600px)" srcset="photos/skylark-sue80-marquee-4x5.jpg" width="1600" height="2000">
+          <img src="photos/skylark-sue80-marquee-16x9.jpg" width="2400" height="1350" alt="SUE marquee lights at an 80th birthday party at Skylark" loading="lazy" onerror="this.style.display='none'">
+        </picture>
         <img src="photos/7.jpg" alt="Bar with TVs during an 80th birthday at The Skylark" loading="lazy" onerror="this.style.display='none'">
         <img src="photos/8.jpg" alt="Buffet table with lit SUE marquee letters" loading="lazy" onerror="this.style.display='none'">
         <img src="photos/9.jpg" alt="Happy 80th Birthday cake" loading="lazy" onerror="this.style.display='none'">
@@ -254,6 +298,7 @@
       <button class="carousel-btn next" onclick="carouselMove(1)" aria-label="Next photo">&rsaquo;</button>
       <div class="carousel-dots" id="carouselDots"></div>
     </div>
+    <p class="photo-credit">Event photos by Kaylin Hermes</p>
   </section>
 
   <section id="reviews">
@@ -698,7 +743,7 @@
 
   // ---- CAROUSEL ----
   let carouselIndex = 0;
-  const carouselCount = 19;
+  const carouselCount = 22;
 
   function initCarousel(){
     const dotsEl = document.getElementById('carouselDots');
