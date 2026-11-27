@@ -69,8 +69,25 @@
   .carousel{ position:relative; border-radius:14px; overflow:hidden; border:1px solid var(--line); background:var(--ink-2); }
   .carousel-track{ display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; }
   .carousel-track::-webkit-scrollbar{ display:none; }
-  .carousel-track img{ flex:0 0 100%; scroll-snap-align:start; width:100%; height:420px; object-fit:cover; display:block; }
-  @media(max-width:600px){ .carousel-track img{ height:260px; } }
+  .carousel-track img, .carousel-track picture, .carousel-track figure{
+    flex:0 0 100%; scroll-snap-align:start; width:100%; height:420px; object-fit:cover; display:block; margin:0; position:relative;
+  }
+  .carousel-track picture img, .carousel-track figure img, .carousel-track figure picture{
+    flex:none; width:100%; height:100%; object-fit:cover; display:block;
+  }
+  @media(max-width:600px){
+    .carousel-track img, .carousel-track picture, .carousel-track figure{ height:260px; }
+  }
+  .party-grid{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; }
+  .party-grid figure{ margin:0; }
+  .party-grid img, .party-grid picture{ display:block; width:100%; }
+  .party-grid img{
+    width:100%; height:220px; object-fit:cover; border-radius:14px; border:1px solid var(--line);
+  }
+  @media(max-width:600px){
+    .party-grid{ grid-template-columns:1fr; }
+    .party-grid img{ height:260px; }
+  }
   .carousel-btn{ position:absolute; top:50%; transform:translateY(-50%); background:rgba(11,11,12,0.6); color:var(--chrome-lt); border:1px solid var(--line); width:40px; height:40px; border-radius:50%; font-size:20px; cursor:pointer; }
   .carousel-btn.prev{ left:12px; }
   .carousel-btn.next{ right:12px; }
@@ -226,6 +243,30 @@
     </div>
   </section>
 
+  <section id="celebrations">
+    <h2>Birthdays &amp; Private Parties</h2>
+    <div class="party-grid">
+      <figure>
+        <picture>
+          <source media="(max-width: 600px)" srcset="photos/skylark-sue80-cake-4x5.jpg" width="1600" height="2000">
+          <img src="photos/skylark-sue80-cake-16x9.jpg" width="2400" height="1350" alt="Candlelit birthday cake at a private party at Skylark" loading="lazy">
+        </picture>
+      </figure>
+      <figure>
+        <picture>
+          <source media="(max-width: 600px)" srcset="photos/skylark-party-50th-table-4x5.jpg" width="1600" height="2000">
+          <img src="photos/skylark-party-50th-table-16x9.jpg" width="2400" height="1350" alt="Dessert table at a 50th birthday party at Skylark" loading="lazy">
+        </picture>
+      </figure>
+      <figure>
+        <picture>
+          <source media="(max-width: 600px)" srcset="photos/skylark-party-lsu-4x5.jpg" width="1600" height="2000">
+          <img src="photos/skylark-party-lsu-16x9.jpg" width="2400" height="1350" alt="Football-themed private party in the game room at Skylark" loading="lazy">
+        </picture>
+      </figure>
+    </div>
+  </section>
+
   <section id="gallery">
     <h2>The Space</h2>
     <div class="carousel">
@@ -236,6 +277,10 @@
         <img src="photos/4.jpg" alt="The Skylark games area" loading="lazy" onerror="this.style.display='none'">
         <img src="photos/5.jpg" alt="The Skylark exterior" loading="lazy" onerror="this.style.display='none'">
         <img src="photos/6.jpg" alt="The Skylark event setup" loading="lazy" onerror="this.style.display='none'">
+        <picture>
+          <source media="(max-width: 600px)" srcset="photos/skylark-sue80-dance-4x5.jpg" width="1080" height="1350">
+          <img src="photos/skylark-sue80-dance-16x9.jpg" width="2400" height="1350" alt="Guests dancing at a private event at Skylark" loading="lazy" onerror="this.style.display='none'">
+        </picture>
         <img src="photos/7.jpg" alt="Bar with TVs during an 80th birthday at The Skylark" loading="lazy" onerror="this.style.display='none'">
         <img src="photos/8.jpg" alt="Buffet table with lit SUE marquee letters" loading="lazy" onerror="this.style.display='none'">
         <img src="photos/9.jpg" alt="Happy 80th Birthday cake" loading="lazy" onerror="this.style.display='none'">
@@ -698,7 +743,7 @@
 
   // ---- CAROUSEL ----
   let carouselIndex = 0;
-  const carouselCount = 19;
+  const carouselCount = 20;
 
   function initCarousel(){
     const dotsEl = document.getElementById('carouselDots');
